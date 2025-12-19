@@ -26,7 +26,7 @@ public class Ticket {
     private double precio;
     @Column(unique = true)
     private TypeTicket type;
-    @Column(name = "qrCode",nullable = false)
+    @Column(name = "qrCode",nullable = false, unique = true)
     private String qrCode;
 
     @ManyToOne

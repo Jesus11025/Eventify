@@ -1,5 +1,6 @@
 package com.salesianos.edu.eventifyjesuszamorano.Model;
 
+import com.salesianos.edu.eventifyjesuszamorano.Enum.EstadoEvento;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,7 +9,6 @@ import java.util.List;
 
 @Setter
 @Getter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -21,7 +21,9 @@ public class Event {
     private Long id;
 
     private String nombre;
-    private LocalDate fechaCreacion;
+    private LocalDate fechaRealizacion;
+    private EstadoEvento estadoEvento;
+    private int cantidadEntradasVendidas;
 
     @ManyToOne
     private Organizer organizer;

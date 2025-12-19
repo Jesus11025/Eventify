@@ -1,5 +1,6 @@
 package com.salesianos.edu.eventifyjesuszamorano.Service;
 
+import com.salesianos.edu.eventifyjesuszamorano.Enum.EstadoEvento;
 import com.salesianos.edu.eventifyjesuszamorano.Model.Attendee;
 import com.salesianos.edu.eventifyjesuszamorano.Model.Event;
 import com.salesianos.edu.eventifyjesuszamorano.Model.Ticket;
@@ -19,7 +20,7 @@ public class TicketService {
     private EventRepository eventRepository;
     private AttendeeRepository attendeeRepository;
 
-    public void buyTicket(Ticket ticket) {
+    public void buyTicket(Ticket ticket, Long idAttende) {
         if (ticket == null) {
             throw new RuntimeException("El ticket no puede ser nulo");
         }
@@ -35,12 +36,28 @@ public class TicketService {
 
         Event eventS = eventRepository.findById(ticket.getEvent().getId())
                 .orElseThrow(() -> new RuntimeException("Evento no encontrado"));
-        Attendee attendeeS = attendeeRepository.findById(ticket.getAttendee().getId())
+        Attendee attendeeS = attendeeRepository.findById(idAttende)
                 .orElseThrow(() -> new RuntimeException("Attendee no encontrado"));
 
         if (ticketRepository.existsByAttendeeAndEvent(attendeeS.getId(), eventS.getId())) {
             throw new RuntimeException("Ya hay un ticket identico a este");
         }
+        if(attendeeS.getTickets().contains(eventS.getTicket())) {
+            throw new RuntimeException("El attendee ya tiene una entrada para dicho evento");
+        }
+        if(ticket.getEvent().getEstadoEvento() != EstadoEvento.PUBLISHED) {
+            if(eventS.getVenue().getAforoMax() > eventS.getCantidadEntradasVendidas()) {
+                ticket.setAttendee(attendeeS);
+                ticket.setEvent(eventS);
+
+                ticketRepository.save(ticket);
+            } else {
+                throw new RuntimeException("El afoto ya está completo");
+            }
+        } else {
+            throw new RuntimeException("El estado del evento esta cancelado o ya ha acabado");
+        }
+
 
         ticket.setAttendee(attendeeS);
         ticket.setEvent(eventS);
